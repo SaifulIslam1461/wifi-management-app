@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ওয়াইফাই ম্যানেজমেন্ট ড্যাশবোর্ড</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <h2><i class="fa-solid fa-wifi"></i> ওয়াইফাই ম্যানেজার</h2>
+            <ul>
+                <li class="active" onclick="switchTab('dashboard')"><i class="fa-solid fa-chart-line"></i> ড্যাশবোর্ড</li>
+                <li onclick="switchTab('customers')"><i class="fa-solid fa-users"></i> গ্রাহক তালিকা</li>
+                <li onclick="switchTab('payments')"><i class="fa-solid fa-money-bill-wave"></i> পেমেন্ট হিসাব</li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header>
+                <h2>ড্যাশবোর্ড ওভারভিউ</h2>
+                <span id="current-date"></span>
+            </header>
+
+            <!-- Dashboard Tab -->
+            <section id="dashboard-tab" class="tab-content active">
+                <div class="cards">
+                    <div class="card">
+                        <h3>মোট গ্রাহক</h3>
+                        <p id="total-customers">0</p>
+                    </div>
+                    <div class="card">
+                        <h3>চলতি মাসে পরিশোধিত</h3>
+                        <p id="paid-count">0</p>
+                    </div>
+                    <div class="card">
+                        <h3>বাকি আছে</h3>
+                        <p id="due-count">0</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Customers Tab -->
+            <section id="customers-tab" class="tab-content">
+                <div class="section-header">
+                    <h3>গ্রাহক ব্যবস্থাপনা</h3>
+                    <button class="btn-primary" onclick="openCustomerModal()"><i class="fa-solid fa-user-plus"></i> নতুন গ্রাহক যোগ করুন</button>
+                </div>
+                <div class="table-responsive">
+                    <table id="customer-table">
+                        <thead>
+                            <tr>
+                                <th>নাম</th>
+                                <th>রুম নং</th>
+                                <th>মোবাইল</th>
+                                <th>হোয়াটসঅ্যাপ</th>
+                                <th>ডিভাইস নাম</th>
+                                <th>অ্যাকশন</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Dynamic Customer Rows -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Payments Tab -->
+            <section id="payments-tab" class="tab-content">
+                <h3>পেমেন্ট ও রিসিট ম্যানেজমেন্ট</h3>
+                <div class="table-responsive">
+                    <table id="payment-table">
+                        <thead>
+                            <tr>
+                                <th>নাম</th>
+                                <th>রুম নং</th>
+                                <th>মাস</th>
+                                <th>স্ট্যাটাস</th>
+                                <th>অ্যাকশন</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Dynamic Payment Rows -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Customer Modal -->
+    <div id="customer-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeCustomerModal()">&times;</span>
+            <h3>গ্রাহকের তথ্য যোগ করুন</h3>
+            <form id="customer-form">
+                <input type="text" id="c-name" placeholder="গ্রাহকের নাম" required>
+                <input type="text" id="c-room" placeholder="রুম নম্বর" required>
+                <input type="text" id="c-phone" placeholder="মোবাইল নম্বর" required>
+                <input type="text" id="c-whatsapp" placeholder="হোয়াটসঅ্যাপ নম্বর" required>
+                <input type="text" id="c-device" placeholder="ডিভাইসের নাম" required>
+                <button type="submit" class="btn-primary">সংরক্ষণ করুন</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
