@@ -3,110 +3,185 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ওয়াইফাই ম্যানেজমেন্ট ড্যাশবোর্ড</title>
+    <title>WiFi Manager & Billing System</title>
     <link rel="stylesheet" href="style.css">
-    <!-- FontAwesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
 
-    <div class="container">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <h2><i class="fa-solid fa-wifi"></i> ওয়াইফাই ম্যানেজার</h2>
-            <ul>
-                <li class="active" onclick="switchTab('dashboard')"><i class="fa-solid fa-chart-line"></i> ড্যাশবোর্ড</li>
-                <li onclick="switchTab('customers')"><i class="fa-solid fa-users"></i> গ্রাহক তালিকা</li>
-                <li onclick="switchTab('payments')"><i class="fa-solid fa-money-bill-wave"></i> পেমেন্ট হিসাব</li>
-            </ul>
-        </aside>
-
-        <!-- Main Content -->
+    <div class="app-container">
+        <!-- Main Content Area -->
         <main class="main-content">
-            <header>
-                <h2>ড্যাশবোর্ড ওভারভিউ</h2>
-                <span id="current-date"></span>
+            <!-- Header -->
+            <header class="app-header">
+                <div class="header-title">
+                    <h2 id="page-title">ড্যাশবোর্ড</h2>
+                    <span id="current-date"></span>
+                </div>
+                <div class="header-icon" onclick="switchTab('settings')">
+                    <i class="fa-solid fa-gear"></i>
+                </div>
             </header>
 
-            <!-- Dashboard Tab -->
+            <!-- 1. Dashboard Tab -->
             <section id="dashboard-tab" class="tab-content active">
-                <div class="cards">
+                <div class="router-status-banner">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <div>
+                        <h4>রাউটার সংযুক্ত আছে</h4>
+                        <p>IP: 192.168.0.1</p>
+                    </div>
+                </div>
+
+                <div class="cards-grid">
                     <div class="card">
                         <h3>মোট গ্রাহক</h3>
                         <p id="total-customers">0</p>
                     </div>
                     <div class="card">
-                        <h3>চলতি মাসে পরিশোধিত</h3>
-                        <p id="paid-count">0</p>
+                        <h3>চলতি মাসের আয়</h3>
+                        <p id="total-income">৳ 0</p>
                     </div>
                     <div class="card">
-                        <h3>বাকি আছে</h3>
-                        <p id="due-count">0</p>
+                        <h3>বাকি বিল</h3>
+                        <p id="due-amount">৳ 0</p>
                     </div>
                 </div>
             </section>
 
-            <!-- Customers Tab -->
+            <!-- 2. Customers Tab -->
             <section id="customers-tab" class="tab-content">
                 <div class="section-header">
-                    <h3>গ্রাহক ব্যবস্থাপনা</h3>
-                    <button class="btn-primary" onclick="openCustomerModal()"><i class="fa-solid fa-user-plus"></i> নতুন গ্রাহক যোগ করুন</button>
+                    <div class="search-box">
+                        <i class="fa-solid fa-search"></i>
+                        <input type="text" id="search-customer" placeholder="গ্রাহক খুঁজুন..." oninput="searchCustomers()">
+                    </div>
+                    <button class="btn-primary" onclick="openCustomerModal()"><i class="fa-solid fa-user-plus"></i> যোগ করুন</button>
                 </div>
-                <div class="table-responsive">
-                    <table id="customer-table">
-                        <thead>
-                            <tr>
-                                <th>নাম</th>
-                                <th>রুম নং</th>
-                                <th>মোবাইল</th>
-                                <th>হোয়াটসঅ্যাপ</th>
-                                <th>ডিভাইস নাম</th>
-                                <th>অ্যাকশন</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Dynamic Customer Rows -->
-                        </tbody>
-                    </table>
+                <div class="customer-list" id="customer-list-container">
+                    <!-- Dynamic Customer Cards -->
                 </div>
             </section>
 
-            <!-- Payments Tab -->
-            <section id="payments-tab" class="tab-content">
-                <h3>পেমেন্ট ও রিসিট ম্যানেজমেন্ট</h3>
+            <!-- 3. Billing Tab -->
+            <section id="billing-tab" class="tab-content">
+                <div class="section-header">
+                    <h3>বিল ও পেমেন্ট হিসাব</h3>
+                </div>
                 <div class="table-responsive">
-                    <table id="payment-table">
+                    <table id="billing-table">
                         <thead>
                             <tr>
-                                <th>নাম</th>
-                                <th>রুম নং</th>
+                                <th>নাম ও রুম</th>
                                 <th>মাস</th>
+                                <th>টাকা</th>
                                 <th>স্ট্যাটাস</th>
                                 <th>অ্যাকশন</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <!-- Dynamic Payment Rows -->
+                            <!-- Dynamic Billing Rows -->
                         </tbody>
                     </table>
                 </div>
             </section>
+
+            <!-- 4. Reports Tab -->
+            <section id="reports-tab" class="tab-content">
+                <div class="reports-grid">
+                    <div class="report-card" onclick="switchTab('customers')">
+                        <i class="fa-solid fa-users" style="color: #3b82f6;"></i>
+                        <h4>গ্রাহক রিপোর্ট</h4>
+                    </div>
+                    <div class="report-card" onclick="switchTab('billing')">
+                        <i class="fa-solid fa-wallet" style="color: #10b981;"></i>
+                        <h4>আয় রিপোর্ট</h4>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 5. Settings Tab -->
+            <section id="settings-tab" class="tab-content">
+                <div class="settings-list">
+                    <div class="setting-item" onclick="exportDataJSON()">
+                        <i class="fa-solid fa-download"></i>
+                        <span>ডাটাবেস ব্যাকআপ (JSON)</span>
+                    </div>
+                    <div class="setting-item" onclick="importDataJSON()">
+                        <i class="fa-solid fa-upload"></i>
+                        <span>ডাটাবেস রিস্টোর</span>
+                    </div>
+                    <div class="setting-item" onclick="clearAllData()" style="color: #ef4444;">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        <span>সব ডাটা মুছে ফেলুন</span>
+                    </div>
+                </div>
+            </section>
         </main>
+
+        <!-- Bottom Navigation Bar -->
+        <nav class="bottom-nav">
+            <div class="nav-item active" onclick="switchTab('dashboard')">
+                <i class="fa-solid fa-house"></i>
+                <span>হোম</span>
+            </div>
+            <div class="nav-item" onclick="switchTab('customers')">
+                <i class="fa-solid fa-users"></i>
+                <span>গ্রাহক</span>
+            </div>
+            <div class="nav-item" onclick="switchTab('billing')">
+                <i class="fa-solid fa-file-invoice-dollar"></i>
+                <span>বিলিং</span>
+            </div>
+            <div class="nav-item" onclick="switchTab('reports')">
+                <i class="fa-solid fa-chart-pie"></i>
+                <span>রিপোর্ট</span>
+            </div>
+            <div class="nav-item" onclick="switchTab('settings')">
+                <i class="fa-solid fa-bars"></i>
+                <span>আরও</span>
+            </div>
+        </nav>
     </div>
 
-    <!-- Customer Modal -->
+    <!-- Add/Edit Customer Modal -->
     <div id="customer-modal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeCustomerModal()">&times;</span>
-            <h3>গ্রাহকের তথ্য যোগ করুন</h3>
+            <h3 id="modal-title">নতুন গ্রাহক যোগ করুন</h3>
             <form id="customer-form">
-                <input type="text" id="c-name" placeholder="গ্রাহকের নাম" required>
-                <input type="text" id="c-room" placeholder="রুম নম্বর" required>
-                <input type="text" id="c-phone" placeholder="মোবাইল নম্বর" required>
-                <input type="text" id="c-whatsapp" placeholder="হোয়াটসঅ্যাপ নম্বর" required>
-                <input type="text" id="c-device" placeholder="ডিভাইসের নাম" required>
-                <button type="submit" class="btn-primary">সংরক্ষণ করুন</button>
+                <input type="hidden" id="c-id">
+                <label>গ্রাহকের নাম</label>
+                <input type="text" id="c-name" placeholder="নাম লিখুন" required>
+                <label>রুম নম্বর</label>
+                <input type="text" id="c-room" placeholder="যেমন: রুম ১০২" required>
+                <label>মোবাইল নম্বর</label>
+                <input type="text" id="c-phone" placeholder="017xxxxxxxx" required>
+                <label>হোয়াটসঅ্যাপ নম্বর</label>
+                <input type="text" id="c-whatsapp" placeholder="88017xxxxxxxx" required>
+                <label>ডিভাইসের নাম</label>
+                <input type="text" id="c-device" placeholder="যেমন: TP-Link-WiFi" required>
+                <label>মাসিক বিল (টাকা)</label>
+                <input type="number" id="c-bill" value="500" required>
+                <button type="submit" class="btn-primary full-width">সংরক্ষণ করুন</button>
             </form>
+        </div>
+    </div>
+
+    <!-- Receipt / Success Modal -->
+    <div id="receipt-modal" class="modal">
+        <div class="modal-content receipt-box">
+            <span class="close" onclick="closeReceiptModal()">&times;</span>
+            <div class="receipt-header">
+                <i class="fa-solid fa-circle-check"></i>
+                <h3>পেমেন্ট সফল হয়েছে</h3>
+            </div>
+            <div id="receipt-details" class="receipt-body">
+                <!-- Receipt Info -->
+            </div>
+            <div class="receipt-actions">
+                <button class="btn-primary" onclick="shareWhatsApp()"><i class="fa-brands fa-whatsapp"></i> হোয়াটসঅ্যাপে পাঠান</button>
+            </div>
         </div>
     </div>
 
