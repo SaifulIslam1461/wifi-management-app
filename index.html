@@ -1,875 +1,658 @@
-
 <!DOCTYPE html>
-<html lang="bn" class="dark">
+<html lang="bn">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>স্পিডনেট ওয়াইফাই জোন্ - Management Dashboard</title>
-    <!-- Tailwind CSS -->
+    <title>স্পিডনেট ওয়াইফাই জোন্</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
+    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts: Hind Siliguri -->
-    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- html2pdf for PDF generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            50: '#ecfdf5',
-                            100: '#d1fae5',
-                            500: '#10b981',
-                            600: '#059669',
-                            700: '#047857',
-                            darkBg: '#090d16',
-                            cardBg: '#131b2e',
-                            cardHover: '#1c2842',
-                            inputBg: '#0b1120',
-                            borderColor: '#1e2d4a'
-                        }
-                    },
-                    fontFamily: {
-                        sans: ['Hind Siliguri', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@300;400;500;600;700&display=swap');
         body {
             font-family: 'Hind Siliguri', sans-serif;
-            background-color: #090d16;
-            color: #e2e8f0;
+            background-color: #0b1120;
+            color: #f3f4f6;
         }
-        /* Custom scrollbars */
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glass-card-hover {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glass-card-hover:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.3);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+        /* Custom scrollbar */
         ::-webkit-scrollbar {
             width: 6px;
-            height: 6px;
         }
         ::-webkit-scrollbar-track {
-            background: #090d16;
+            background: #0b1120;
         }
         ::-webkit-scrollbar-thumb {
-            background: #1e2d4a;
-            border-radius: 9999px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #10b981;
-        }
-        .glow-effect {
-            box-shadow: 0 0 20px -5px rgba(16, 185, 129, 0.3);
-        }
-        .card-square {
-            aspect-ratio: 1 / 1;
+            background: #334155;
+            border-radius: 3px;
         }
     </style>
 </head>
-<body class="min-h-screen bg-brand-darkBg text-slate-100 flex flex-col justify-between selection:bg-brand-500 selection:text-white">
+<body class="min-h-screen pb-12">
 
-    <!-- Header / Navbar -->
-    <header class="sticky top-0 z-30 bg-brand-cardBg/90 backdrop-blur-md border-b border-brand-borderColor shadow-lg px-4 py-3">
-        <div class="max-w-6xl mx-auto flex items-center justify-between">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-brand-500/20 border border-brand-500/40 flex items-center justify-center text-brand-500 text-xl font-bold shadow-sm">
-                    <i class="fa-solid fa-wifi"></i>
+    <!-- Top Navbar -->
+    <nav class="sticky top-0 z-40 glass-card bg-slate-900/90 border-b border-slate-800 px-4 py-3 mb-6">
+        <div class="max-w-md mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-3 space-x-reverse">
+                <div class="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center border border-emerald-500/30">
+                    <i class="fa-solid fa-wifi text-xl"></i>
                 </div>
                 <div>
-                    <h1 class="text-xl md:text-2xl font-bold text-brand-500 tracking-wide leading-tight" id="headerWifiName">
-                        স্পিডনেট ওয়াইফাই জোন্
-                    </h1>
-                    <p class="text-xs text-slate-400">
-                        এডমিন: <span id="headerAdminName" class="text-slate-200 font-medium">মো: আরিফুল ইসলাম</span>
-                    </p>
+                    <h1 id="navAppTitle" class="font-bold text-lg text-emerald-400 leading-tight">স্পিডনেট ওয়াইফাই জোন্</h1>
+                    <p class="text-xs text-slate-400">এডমিন: <span id="navAdminName">মো: সাইফুল ইসলাম</span></p>
                 </div>
             </div>
-            
-            <button onclick="openModal('settingsModal')" class="w-10 h-10 rounded-xl bg-slate-800 hover:bg-brand-borderColor border border-slate-700 flex items-center justify-center text-slate-300 hover:text-brand-500 transition-all duration-200 shadow-md">
+            <button onclick="openModal('settingsModal')" class="p-2.5 rounded-xl bg-slate-800 text-slate-300 hover:text-emerald-400 hover:bg-slate-700 transition border border-slate-700">
                 <i class="fa-solid fa-gear text-lg"></i>
             </button>
         </div>
-    </header>
+    </nav>
 
-    <!-- Main Body Container -->
-    <main class="max-w-6xl w-full mx-auto px-4 py-6 flex-grow space-y-6">
+    <main class="max-w-md mx-auto px-4 space-y-6">
 
-        <!-- 1. Top Action Cards (Updated: Compact & Square-styled Grid Layout) -->
-        <section class="grid grid-cols-3 gap-3 md:gap-5">
-            
-            <!-- Action 1: Expense Entry -->
-            <button onclick="openModal('expenseModal')" class="group relative flex flex-col items-center justify-center p-3 md:p-5 rounded-2xl bg-gradient-to-b from-brand-cardBg to-brand-cardBg/80 border border-brand-borderColor hover:border-rose-500/50 hover:bg-brand-cardHover transition-all duration-300 shadow-xl overflow-hidden card-square">
-                <div class="absolute -top-10 -right-10 w-24 h-24 bg-rose-500/10 rounded-full blur-xl group-hover:bg-rose-500/20 transition-all"></div>
-                <div class="w-12 h-12 md:w-16 md:h-16 rounded-2xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-400 text-xl md:text-2xl mb-2 group-hover:scale-110 group-hover:bg-rose-500 group-hover:text-white transition-all shadow-md">
-                    <i class="fa-solid fa-receipt"></i>
+        <!-- Action Cards Grid (1 / 3 Compact Square Style Layout) -->
+        <div class="grid grid-cols-3 gap-3">
+            <!-- Expense Entry -->
+            <button onclick="openExpenseModal()" class="glass-card glass-card-hover rounded-2xl p-3 flex flex-col items-center text-center justify-center space-y-2 border-t-2 border-t-rose-500 group">
+                <div class="w-11 h-11 rounded-xl bg-rose-500/15 text-rose-400 flex items-center justify-center group-hover:scale-110 transition">
+                    <i class="fa-solid fa-receipt text-lg"></i>
                 </div>
-                <span class="text-sm md:text-base font-bold text-slate-100 group-hover:text-rose-400 transition-colors text-center">খরচ এন্ট্রি</span>
-                <span class="hidden md:block text-[11px] text-slate-400 text-center mt-1">রাউটার, তার ইত্যাদি</span>
+                <div>
+                    <span class="font-bold text-sm block text-slate-100">খরচ এন্ট্রি</span>
+                    <span class="text-[10px] text-slate-400 block leading-tight mt-0.5">দৈনন্দিন ব্যয়</span>
+                </div>
             </button>
 
-            <!-- Action 2: New Customer Entry -->
-            <button onclick="openModal('customerModal')" class="group relative flex flex-col items-center justify-center p-3 md:p-5 rounded-2xl bg-gradient-to-b from-brand-cardBg to-brand-cardBg/80 border border-brand-borderColor hover:border-brand-500/50 hover:bg-brand-cardHover transition-all duration-300 shadow-xl overflow-hidden card-square">
-                <div class="absolute -top-10 -right-10 w-24 h-24 bg-brand-500/10 rounded-full blur-xl group-hover:bg-brand-500/20 transition-all"></div>
-                <div class="w-12 h-12 md:w-16 md:h-16 rounded-2xl bg-brand-500/10 border border-brand-500/30 flex items-center justify-center text-brand-500 text-xl md:text-2xl mb-2 group-hover:scale-110 group-hover:bg-brand-500 group-hover:text-white transition-all shadow-md">
-                    <i class="fa-solid fa-user-plus"></i>
+            <!-- New Customer Entry -->
+            <button onclick="openCustomerModal()" class="glass-card glass-card-hover rounded-2xl p-3 flex flex-col items-center text-center justify-center space-y-2 border-t-2 border-t-emerald-500 group">
+                <div class="w-11 h-11 rounded-xl bg-emerald-500/15 text-emerald-400 flex items-center justify-center group-hover:scale-110 transition">
+                    <i class="fa-solid fa-user-plus text-lg"></i>
                 </div>
-                <span class="text-sm md:text-base font-bold text-slate-100 group-hover:text-brand-500 transition-colors text-center">নতুন গ্রাহক</span>
-                <span class="hidden md:block text-[11px] text-slate-400 text-center mt-1">নতুন ওয়াইফাই ব্যবহারকারী</span>
+                <div>
+                    <span class="font-bold text-sm block text-slate-100">নতুন গ্রাহক</span>
+                    <span class="text-[10px] text-slate-400 block leading-tight mt-0.5">নতুন সংযোগ</span>
+                </div>
             </button>
 
-            <!-- Action 3: WiFi Bill Entry -->
-            <button onclick="openModal('billModal')" class="group relative flex flex-col items-center justify-center p-3 md:p-5 rounded-2xl bg-gradient-to-b from-brand-cardBg to-brand-cardBg/80 border border-brand-borderColor hover:border-amber-500/50 hover:bg-brand-cardHover transition-all duration-300 shadow-xl overflow-hidden card-square">
-                <div class="absolute -top-10 -right-10 w-24 h-24 bg-amber-500/10 rounded-full blur-xl group-hover:bg-amber-500/20 transition-all"></div>
-                <div class="w-12 h-12 md:w-16 md:h-16 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 text-xl md:text-2xl mb-2 group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all shadow-md">
-                    <i class="fa-solid fa-money-bill-wave"></i>
+            <!-- Bill Entry -->
+            <button onclick="openBillModal()" class="glass-card glass-card-hover rounded-2xl p-3 flex flex-col items-center text-center justify-center space-y-2 border-t-2 border-t-amber-500 group">
+                <div class="w-11 h-11 rounded-xl bg-amber-500/15 text-amber-400 flex items-center justify-center group-hover:scale-110 transition">
+                    <i class="fa-solid fa-money-bill-wave text-lg"></i>
                 </div>
-                <span class="text-sm md:text-base font-bold text-slate-100 group-hover:text-amber-400 transition-colors text-center">বিল এন্ট্রি</span>
-                <span class="hidden md:block text-[11px] text-slate-400 text-center mt-1">মাসিক বিল সংগ্রহ</span>
+                <div>
+                    <span class="font-bold text-sm block text-slate-100">বিল এন্ট্রি</span>
+                    <span class="text-[10px] text-slate-400 block leading-tight mt-0.5">বিল সংগ্রহ</span>
+                </div>
             </button>
+        </div>
 
-        </section>
-
-        <!-- Stats Counter Cards Grid -->
-        <section class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-            
-            <div class="bg-brand-cardBg border border-brand-borderColor rounded-2xl p-4 flex flex-col justify-between shadow-md">
-                <div class="flex items-center justify-between mb-2">
-                    <span class="text-xs md:text-sm text-slate-400 font-medium">মোট সক্রিয় গ্রাহক</span>
-                    <div class="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
+        <!-- Metric Overview Grid -->
+        <div class="grid grid-cols-2 gap-3">
+            <div class="glass-card rounded-2xl p-4 relative overflow-hidden">
+                <div class="flex justify-between items-start mb-2">
+                    <span class="text-xs text-slate-400 font-medium">মোট সক্রিয় গ্রাহক</span>
+                    <div class="w-7 h-7 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-xs">
                         <i class="fa-solid fa-users"></i>
                     </div>
                 </div>
-                <div>
-                    <span class="text-2xl md:text-3xl font-extrabold text-brand-500" id="totalActiveCustomers">2</span>
-                    <p class="text-[11px] text-slate-500 mt-1">মোট রেজিস্টার্ড গ্রাহক</p>
-                </div>
+                <div id="totalCustomers" class="text-2xl font-bold text-white mb-1">0</div>
+                <span class="text-[10px] text-slate-500">মোট কানেকশন</span>
             </div>
 
-            <div class="bg-brand-cardBg border border-brand-borderColor rounded-2xl p-4 flex flex-col justify-between shadow-md">
-                <div class="flex items-center justify-between mb-2">
-                    <span class="text-xs md:text-sm text-slate-400 font-medium">চলতি মাসে আয়</span>
-                    <div class="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
+            <div class="glass-card rounded-2xl p-4 relative overflow-hidden">
+                <div class="flex justify-between items-start mb-2">
+                    <span class="text-xs text-slate-400 font-medium">চলতি মাসে আয়</span>
+                    <div class="w-7 h-7 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-xs">
                         <i class="fa-solid fa-wallet"></i>
                     </div>
                 </div>
-                <div>
-                    <span class="text-2xl md:text-3xl font-extrabold text-white">৳ <span id="monthlyIncome">2000</span></span>
-                    <p class="text-[11px] text-slate-500 mt-1">বিল সংগ্রহ সফল</p>
-                </div>
+                <div id="monthlyIncome" class="text-2xl font-bold text-emerald-400 mb-1">৳ 0</div>
+                <span class="text-[10px] text-slate-500">আদায়কৃত বিল</span>
             </div>
 
-            <div class="bg-brand-cardBg border border-brand-borderColor rounded-2xl p-4 flex flex-col justify-between shadow-md">
-                <div class="flex items-center justify-between mb-2">
-                    <span class="text-xs md:text-sm text-slate-400 font-medium">চলতি মাসে খরচ</span>
-                    <div class="w-8 h-8 rounded-lg bg-rose-500/10 text-rose-400 flex items-center justify-center">
-                        <i class="fa-solid fa-arrow-down-long"></i>
+            <div class="glass-card rounded-2xl p-4 relative overflow-hidden">
+                <div class="flex justify-between items-start mb-2">
+                    <span class="text-xs text-slate-400 font-medium">চলতি মাসে খরচ</span>
+                    <div class="w-7 h-7 rounded-lg bg-rose-500/10 text-rose-400 flex items-center justify-center text-xs">
+                        <i class="fa-solid fa-arrow-down"></i>
                     </div>
                 </div>
-                <div>
-                    <span class="text-2xl md:text-3xl font-extrabold text-rose-400">৳ <span id="monthlyExpense">0</span></span>
-                    <p class="text-[11px] text-slate-500 mt-1">ব্যবসার মোট খরচ</p>
-                </div>
+                <div id="monthlyExpense" class="text-2xl font-bold text-rose-400 mb-1">৳ 0</div>
+                <span class="text-[10px] text-slate-500">মোট হিসেব</span>
             </div>
 
-            <div class="bg-brand-cardBg border border-brand-borderColor rounded-2xl p-4 flex flex-col justify-between shadow-md">
-                <div class="flex items-center justify-between mb-2">
-                    <span class="text-xs md:text-sm text-slate-400 font-medium">মোট বকেয়া বিল</span>
-                    <div class="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center">
+            <div class="glass-card rounded-2xl p-4 relative overflow-hidden">
+                <div class="flex justify-between items-start mb-2">
+                    <span class="text-xs text-slate-400 font-medium">মোট বকেয়া বিল</span>
+                    <div class="w-7 h-7 rounded-lg bg-amber-500/10 text-amber-400 flex items-center justify-center text-xs">
                         <i class="fa-solid fa-triangle-exclamation"></i>
                     </div>
                 </div>
-                <div>
-                    <span class="text-2xl md:text-3xl font-extrabold text-amber-400">৳ <span id="totalDue">0</span></span>
-                    <p class="text-[11px] text-slate-500 mt-1">গ্রাহকদের নিকট বকেয়া</p>
+                <div id="totalDue" class="text-2xl font-bold text-amber-400 mb-1">৳ 0</div>
+                <span class="text-[10px] text-slate-500">গ্রাহকদের কাছে বাকি</span>
+            </div>
+        </div>
+
+        <!-- Customer List Section -->
+        <div class="glass-card rounded-2xl p-4">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="font-bold text-base text-slate-100 flex items-center gap-2">
+                    <i class="fa-solid fa-list text-emerald-400 text-sm"></i> গ্রাহক তালিকা
+                </h2>
+                <div class="relative w-36">
+                    <input type="text" id="searchInput" oninput="renderCustomers()" placeholder="খুঁজুন..." class="w-full bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1 text-xs text-slate-200 focus:outline-none focus:border-emerald-500">
                 </div>
             </div>
 
-        </section>
-
-        <!-- Recent Transactions / Customer List Section -->
-        <section class="bg-brand-cardBg border border-brand-borderColor rounded-2xl p-4 md:p-5 shadow-xl">
-            <div class="flex items-center justify-between mb-4 pb-3 border-b border-brand-borderColor">
-                <h3 class="text-lg font-bold text-white flex items-center gap-2">
-                    <i class="fa-solid fa-list-check text-brand-500"></i> গ্রাহক ও বিলের তালিকা
-                </h3>
-                <span class="text-xs bg-brand-500/10 text-brand-500 px-3 py-1 rounded-full border border-brand-500/20">আপডেটেড</span>
+            <div id="customerList" class="space-y-3 max-h-96 overflow-y-auto pr-1">
+                <!-- Dynamic Customer Items Rendered Here -->
             </div>
-
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse text-sm">
-                    <thead>
-                        <tr class="bg-brand-inputBg text-slate-400 border-b border-brand-borderColor">
-                            <th class="p-3 rounded-l-xl">নাম & আইডি</th>
-                            <th class="p-3">মোবাইল</th>
-                            <th class="p-3">প্যাকেজ / বিল</th>
-                            <th class="p-3">স্ট্যাটাস</th>
-                            <th class="p-3 text-right rounded-r-xl">অ্যাকশন / রসিদ</th>
-                        </tr>
-                    </thead>
-                    <tbody id="customerTableBody">
-                        <!-- Dynamic content filled via JS -->
-                    </tbody>
-                </table>
-            </div>
-        </section>
+        </div>
 
     </main>
 
-    <!-- Footer -->
-    <footer class="text-center py-4 text-xs text-slate-500 border-t border-brand-borderColor bg-brand-cardBg/50">
-        &copy; 2026 স্পিডনেট ওয়াইফাই জোন্ | অল রাইটস সংরক্ষিত
-    </footer>
-
-    <!-- ==================== MODALS SECTION ==================== -->
-
-    <!-- 1. NEW CUSTOMER ENTRY MODAL (Fixed Header Visibility Issue) -->
-    <div id="customerModal" class="fixed inset-0 z-50 flex items-start justify-center bg-black/75 backdrop-blur-sm hidden overflow-y-auto pt-6 pb-10 px-4">
-        <div class="bg-brand-cardBg border border-brand-borderColor rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden my-auto">
-            <!-- Modal Fixed Header -->
-            <div class="sticky top-0 bg-brand-cardBg/95 backdrop-blur border-b border-brand-borderColor px-6 py-4 flex items-center justify-between z-10">
-                <h3 class="text-lg font-bold text-white flex items-center gap-2">
-                    <i class="fa-solid fa-user-plus text-brand-500"></i> নতুন গ্রাহক এন্ট্রি
+    <!-- Modal: New/Edit Customer Form -->
+    <div id="customerModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-start justify-center pt-8 px-4 overflow-y-auto">
+        <div class="glass-card bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-md my-6 overflow-hidden shadow-2xl">
+            <!-- Header Fix: Sticky & Fully Visible -->
+            <div class="bg-slate-800/90 px-5 py-4 border-b border-slate-700 flex justify-between items-center sticky top-0 z-10 backdrop-blur-md">
+                <h3 id="customerModalTitle" class="font-bold text-base text-emerald-400 flex items-center gap-2">
+                    <i class="fa-solid fa-user-plus"></i> নতুন গ্রাহক এন্ট্রি
                 </h3>
-                <button onclick="closeModal('customerModal')" class="text-slate-400 hover:text-white p-1 rounded-lg">
-                    <i class="fa-solid fa-xmark text-xl"></i>
+                <button onclick="closeModal('customerModal')" class="text-slate-400 hover:text-white p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
-            
-            <!-- Modal Body Form (Proper Padding to prevent cut-off) -->
-            <form id="addCustomerForm" onsubmit="handleCustomerSubmit(event)" class="p-6 space-y-4">
+
+            <form id="customerForm" onsubmit="saveCustomer(event)" class="p-5 space-y-4 max-h-[80vh] overflow-y-auto">
+                <input type="hidden" id="customerId">
+                
+                <!-- Field 1: Customer Name -->
                 <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1">গ্রাহকের নাম *</label>
-                    <input type="text" id="custName" required placeholder="উদাহরণ: আব্দুর রহমান" class="w-full bg-brand-inputBg border border-brand-borderColor rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500">
+                    <label class="block text-xs font-medium text-slate-300 mb-1">গ্রাহকের নাম <span class="text-rose-500">*</span></label>
+                    <input type="text" id="custName" required placeholder="উদাহরণ: মোঃ রফিকুল ইসলাম" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-emerald-500">
                 </div>
 
+                <!-- Field 2: WhatsApp Number -->
                 <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1">মোবাইল নম্বর *</label>
-                    <input type="tel" id="custPhone" required placeholder="01700000000" class="w-full bg-brand-inputBg border border-brand-borderColor rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500">
+                    <label class="block text-xs font-medium text-slate-300 mb-1">WhatsApp নম্বর <span class="text-rose-500">*</span></label>
+                    <input type="tel" id="custWhatsapp" required placeholder="01700000000" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-emerald-500">
                 </div>
 
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-300 mb-1">প্যাকেজ / স্পিড</label>
-                        <select id="custPackage" class="w-full bg-brand-inputBg border border-brand-borderColor rounded-xl px-3 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500">
-                            <option value="5 Mbps">5 Mbps</option>
-                            <option value="10 Mbps" selected>10 Mbps</option>
-                            <option value="15 Mbps">15 Mbps</option>
-                            <option value="20 Mbps">20 Mbps</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-300 mb-1">মাসিক বিল (৳) *</label>
-                        <input type="number" id="custBill" required value="500" class="w-full bg-brand-inputBg border border-brand-borderColor rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500">
-                    </div>
-                </div>
-
+                <!-- Field 3: Room / Address -->
                 <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1">ঠিকানা / লোকেশন</label>
-                    <input type="text" id="custAddress" placeholder="রোড #৫, হাউস #১২" class="w-full bg-brand-inputBg border border-brand-borderColor rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500">
+                    <label class="block text-xs font-medium text-slate-300 mb-1">রুম নম্বর / ঠিকানা</label>
+                    <input type="text" id="custRoom" placeholder="যেমন: রুম # ৪০২, ফ্ল্যাট ৩বি" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-emerald-500">
                 </div>
 
-                <div class="pt-4 flex items-center justify-end gap-3 border-t border-brand-borderColor">
-                    <button type="button" onclick="closeModal('customerModal')" class="px-5 py-2.5 rounded-xl border border-slate-700 text-slate-300 hover:bg-slate-800 text-sm font-medium">বাতিল</button>
-                    <button type="submit" class="px-5 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white text-sm font-bold shadow-lg shadow-brand-500/20">সংরক্ষণ করুন</button>
+                <!-- Field 4: Connection Date -->
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">সংযোগের তারিখ</label>
+                    <input type="date" id="custConnDate" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-emerald-500">
+                </div>
+
+                <!-- Field 5: Monthly Bill -->
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">মাসিক বিল (৳) <span class="text-rose-500">*</span></label>
+                    <input type="number" id="custBill" required placeholder="500" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-emerald-500">
+                </div>
+
+                <!-- Field 6: Note (Optional) -->
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">নোট (ঐচ্ছিক)</label>
+                    <textarea id="custNote" rows="2" placeholder="অতিরিক্ত বিবরণ বা তথ্য লিখুন..." class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2 text-sm text-slate-100 focus:outline-none focus:border-emerald-500"></textarea>
+                </div>
+
+                <div class="pt-2 flex gap-3">
+                    <button type="button" onclick="closeModal('customerModal')" class="w-1/2 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium rounded-xl text-sm transition">বাতিল</button>
+                    <button type="submit" class="w-1/2 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-medium rounded-xl text-sm transition shadow-lg shadow-emerald-600/30">সংরক্ষণ করুন</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- 2. EXPENSE ENTRY MODAL -->
-    <div id="expenseModal" class="fixed inset-0 z-50 flex items-start justify-center bg-black/75 backdrop-blur-sm hidden overflow-y-auto pt-6 pb-10 px-4">
-        <div class="bg-brand-cardBg border border-brand-borderColor rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden my-auto">
-            <div class="sticky top-0 bg-brand-cardBg/95 backdrop-blur border-b border-brand-borderColor px-6 py-4 flex items-center justify-between z-10">
-                <h3 class="text-lg font-bold text-white flex items-center gap-2">
-                    <i class="fa-solid fa-receipt text-rose-500"></i> নতুন খরচ এন্ট্রি
+    <!-- Modal: Expense Entry -->
+    <div id="expenseModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-start justify-center pt-8 px-4 overflow-y-auto">
+        <div class="glass-card bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-md my-6 overflow-hidden shadow-2xl">
+            <div class="bg-slate-800/90 px-5 py-4 border-b border-slate-700 flex justify-between items-center sticky top-0 z-10 backdrop-blur-md">
+                <h3 class="font-bold text-base text-rose-400 flex items-center gap-2">
+                    <i class="fa-solid fa-receipt"></i> খরচ এন্ট্রি
                 </h3>
-                <button onclick="closeModal('expenseModal')" class="text-slate-400 hover:text-white p-1 rounded-lg">
-                    <i class="fa-solid fa-xmark text-xl"></i>
+                <button onclick="closeModal('expenseModal')" class="text-slate-400 hover:text-white p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
-            
-            <form onsubmit="handleExpenseSubmit(event)" class="p-6 space-y-4">
+            <form onsubmit="saveExpense(event)" class="p-5 space-y-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1">খরচের বিবরণ *</label>
-                    <input type="text" id="expTitle" required placeholder="উদাহরণ: নতুন রাউটার ক্রয়, ফাইবার তার" class="w-full bg-brand-inputBg border border-brand-borderColor rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-rose-500">
+                    <label class="block text-xs font-medium text-slate-300 mb-1">খরচের খাত <span class="text-rose-500">*</span></label>
+                    <input type="text" id="expTitle" required placeholder="যেমন: নতুন রাউটার বা তার ক্রয়" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-rose-500">
                 </div>
-
                 <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1">টাকার পরিমাণ (৳) *</label>
-                    <input type="number" id="expAmount" required placeholder="0" class="w-full bg-brand-inputBg border border-brand-borderColor rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-rose-500">
+                    <label class="block text-xs font-medium text-slate-300 mb-1">পরিমাণ (৳) <span class="text-rose-500">*</span></label>
+                    <input type="number" id="expAmount" required placeholder="0" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-rose-500">
                 </div>
-
-                <div class="pt-4 flex items-center justify-end gap-3 border-t border-brand-borderColor">
-                    <button type="button" onclick="closeModal('expenseModal')" class="px-5 py-2.5 rounded-xl border border-slate-700 text-slate-300 hover:bg-slate-800 text-sm font-medium">বাতিল</button>
-                    <button type="submit" class="px-5 py-2.5 rounded-xl bg-rose-500 hover:bg-rose-600 text-white text-sm font-bold shadow-lg shadow-rose-500/20">এন্ট্রি করুন</button>
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">তারিখ</label>
+                    <input type="date" id="expDate" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-rose-500">
+                </div>
+                <div class="pt-2 flex gap-3">
+                    <button type="button" onclick="closeModal('expenseModal')" class="w-1/2 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium rounded-xl text-sm transition">বাতিল</button>
+                    <button type="submit" class="w-1/2 py-2.5 bg-rose-600 hover:bg-rose-500 text-white font-medium rounded-xl text-sm transition shadow-lg shadow-rose-600/30">সংরক্ষণ করুন</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- 3. BILL ENTRY MODAL -->
-    <div id="billModal" class="fixed inset-0 z-50 flex items-start justify-center bg-black/75 backdrop-blur-sm hidden overflow-y-auto pt-6 pb-10 px-4">
-        <div class="bg-brand-cardBg border border-brand-borderColor rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden my-auto">
-            <div class="sticky top-0 bg-brand-cardBg/95 backdrop-blur border-b border-brand-borderColor px-6 py-4 flex items-center justify-between z-10">
-                <h3 class="text-lg font-bold text-white flex items-center gap-2">
-                    <i class="fa-solid fa-money-bill-wave text-amber-500"></i> ওয়াইফাই বিল এন্ট্রি
+    <!-- Modal: Bill Entry -->
+    <div id="billModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-start justify-center pt-8 px-4 overflow-y-auto">
+        <div class="glass-card bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-md my-6 overflow-hidden shadow-2xl">
+            <div class="bg-slate-800/90 px-5 py-4 border-b border-slate-700 flex justify-between items-center sticky top-0 z-10 backdrop-blur-md">
+                <h3 class="font-bold text-base text-amber-400 flex items-center gap-2">
+                    <i class="fa-solid fa-money-bill-wave"></i> ওয়াইফাই বিল এন্ট্রি
                 </h3>
-                <button onclick="closeModal('billModal')" class="text-slate-400 hover:text-white p-1 rounded-lg">
-                    <i class="fa-solid fa-xmark text-xl"></i>
+                <button onclick="closeModal('billModal')" class="text-slate-400 hover:text-white p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
-            
-            <form onsubmit="handleBillSubmit(event)" class="p-6 space-y-4">
+            <form onsubmit="saveBill(event)" class="p-5 space-y-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1">গ্রাহক নির্বাচন করুন *</label>
-                    <select id="billCustomerSelect" required class="w-full bg-brand-inputBg border border-brand-borderColor rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
-                        <!-- Populated by JS -->
+                    <label class="block text-xs font-medium text-slate-300 mb-1">গ্রাহক নির্বাচন করুন <span class="text-rose-500">*</span></label>
+                    <select id="billCustomerId" required onchange="onBillCustomerChange()" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-amber-500">
+                        <!-- Customer Options -->
                     </select>
                 </div>
-
                 <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1">আদায়কৃত বিল (৳) *</label>
-                    <input type="number" id="billAmount" required placeholder="500" class="w-full bg-brand-inputBg border border-brand-borderColor rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-amber-500">
+                    <label class="block text-xs font-medium text-slate-300 mb-1">আদায়কৃত পরিমাণ (৳) <span class="text-rose-500">*</span></label>
+                    <input type="number" id="billAmount" required placeholder="0" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-amber-500">
                 </div>
-
-                <div class="pt-4 flex items-center justify-end gap-3 border-t border-brand-borderColor">
-                    <button type="button" onclick="closeModal('billModal')" class="px-5 py-2.5 rounded-xl border border-slate-700 text-slate-300 hover:bg-slate-800 text-sm font-medium">বাতিল</button>
-                    <button type="submit" class="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white text-sm font-bold shadow-lg shadow-amber-500/20">বিল গ্রহণ করুন</button>
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">পরিশোধের তারিখ</label>
+                    <input type="date" id="billDate" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-amber-500">
+                </div>
+                <div class="pt-2 flex gap-3">
+                    <button type="button" onclick="closeModal('billModal')" class="w-1/2 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium rounded-xl text-sm transition">বাতিল</button>
+                    <button type="submit" class="w-1/2 py-2.5 bg-amber-600 hover:bg-amber-500 text-white font-medium rounded-xl text-sm transition shadow-lg shadow-amber-600/30">বিল জমা দিন</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- 4. SETTINGS MODAL (With Fixed Title Clipping, Signature Canvas & Signature Image Upload Feature) -->
-    <div id="settingsModal" class="fixed inset-0 z-50 flex items-start justify-center bg-black/75 backdrop-blur-sm hidden overflow-y-auto pt-6 pb-10 px-4">
-        <div class="bg-brand-cardBg border border-brand-borderColor rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden my-auto">
-            
-            <!-- Sticky Header for Proper Alignment -->
-            <div class="sticky top-0 bg-brand-cardBg/95 backdrop-blur border-b border-brand-borderColor px-6 py-4 flex items-center justify-between z-10">
-                <h3 class="text-lg font-bold text-white flex items-center gap-2">
-                    <i class="fa-solid fa-sliders text-brand-500"></i> অ্যাপস ও অ্যাকাউন্ট সেটআপ
+    <!-- Modal: Settings (Signature Image Setup) -->
+    <div id="settingsModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-start justify-center pt-8 px-4 overflow-y-auto">
+        <div class="glass-card bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-md my-6 overflow-hidden shadow-2xl">
+            <!-- Settings Header Fix -->
+            <div class="bg-slate-800/90 px-5 py-4 border-b border-slate-700 flex justify-between items-center sticky top-0 z-10 backdrop-blur-md">
+                <h3 class="font-bold text-base text-emerald-400 flex items-center gap-2">
+                    <i class="fa-solid fa-sliders"></i> সেটআপ ও সিগনেচার সেটিং
                 </h3>
-                <button onclick="closeModal('settingsModal')" class="text-slate-400 hover:text-white p-1 rounded-lg">
-                    <i class="fa-solid fa-xmark text-xl"></i>
+                <button onclick="closeModal('settingsModal')" class="text-slate-400 hover:text-white p-1">
+                    <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
-
-            <!-- Form Content -->
-            <form onsubmit="handleSettingsSave(event)" class="p-6 space-y-4 max-h-[80vh] overflow-y-auto">
-                
-                <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1">আপনার নাম (Admin Name) *</label>
-                    <input type="text" id="settingAdminName" required class="w-full bg-brand-inputBg border border-brand-borderColor rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500">
-                </div>
-
-                <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1">ওয়াইফাই এর নাম *</label>
-                    <input type="text" id="settingWifiName" required class="w-full bg-brand-inputBg border border-brand-borderColor rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500">
-                </div>
-
-                <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1">ঠিকানা / লোকেশন</label>
-                    <input type="text" id="settingAddress" class="w-full bg-brand-inputBg border border-brand-borderColor rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500">
-                </div>
-
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-300 mb-1">WhatsApp নম্বর</label>
-                        <input type="tel" id="settingWhatsapp" class="w-full bg-brand-inputBg border border-brand-borderColor rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-slate-300 mb-1">bKash (বিকাশ) নম্বর</label>
-                        <input type="tel" id="settingBkash" class="w-full bg-brand-inputBg border border-brand-borderColor rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-500">
-                    </div>
-                </div>
-
-                <!-- Digital Signature Setup Container -->
-                <div class="pt-2 border-t border-brand-borderColor">
-                    <div class="flex items-center justify-between mb-2">
-                        <label class="block text-xs font-semibold text-brand-500">ডিজিটাল সিগনেচার (পিডিএফ এর জন্য)</label>
-                        <button type="button" onclick="clearSignatureCanvas()" class="text-xs text-rose-400 hover:underline">ক্লিয়ার করুন</button>
-                    </div>
-
-                    <!-- Toggle Tabs: Draw vs Upload -->
-                    <div class="flex gap-2 mb-3">
-                        <button type="button" id="tabDrawBtn" onclick="switchSigTab('draw')" class="flex-1 py-1.5 text-xs font-semibold rounded-lg bg-brand-500 text-white border border-brand-500 transition-all">আঁকুন (Draw)</button>
-                        <button type="button" id="tabUploadBtn" onclick="switchSigTab('upload')" class="flex-1 py-1.5 text-xs font-semibold rounded-lg bg-brand-inputBg text-slate-400 border border-brand-borderColor transition-all">ছবি আপলোড</button>
-                    </div>
-
-                    <!-- Canvas Box -->
-                    <div id="sigDrawContainer" class="bg-white rounded-xl overflow-hidden border border-slate-300 relative h-36">
-                        <canvas id="sigCanvas" class="w-full h-full cursor-crosshair touch-none"></canvas>
-                        <span class="absolute bottom-1 right-2 text-[10px] text-slate-400 pointer-events-none">এখানে মাউস/আঙুল দিয়ে সাইন করুন</span>
-                    </div>
-
-                    <!-- Upload Box -->
-                    <div id="sigUploadContainer" class="hidden bg-brand-inputBg p-4 rounded-xl border border-dashed border-brand-borderColor text-center space-y-2">
-                        <input type="file" id="sigFileInput" accept="image/*" onchange="handleSignatureFileUpload(event)" class="hidden">
-                        <label for="sigFileInput" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-800 border border-slate-700 text-brand-500 text-xs font-bold cursor-pointer hover:bg-slate-700">
-                            <i class="fa-solid fa-upload"></i> সিগনেচার ছবি সিলেক্ট করুন
-                        </label>
-                        <p class="text-[11px] text-slate-400">পিএনজি (PNG) বা স্বচ্ছ ব্যাকগ্রাউন্ডের সিগনেচার পিকচার সবচেয়ে ভালো মানাবে</p>
-                    </div>
-
-                    <!-- Current Active Signature Preview -->
-                    <div class="mt-3 flex items-center justify-between bg-brand-inputBg p-2 rounded-xl border border-brand-borderColor">
-                        <span class="text-xs text-slate-400">বর্তমান সেভ করা সিগনেচার:</span>
-                        <div class="h-10 w-28 bg-white/90 rounded border border-slate-300 p-1 flex items-center justify-center">
-                            <img id="currentSigPreview" src="" alt="No signature" class="max-h-full max-w-full object-contain hidden">
-                            <span id="noSigText" class="text-[10px] text-slate-400">নাই</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="pt-4 flex items-center justify-end gap-3 border-t border-brand-borderColor">
-                    <button type="button" onclick="closeModal('settingsModal')" class="px-5 py-2.5 rounded-xl border border-slate-700 text-slate-300 hover:bg-slate-800 text-sm font-medium">বাতিল</button>
-                    <button type="submit" class="px-5 py-2.5 rounded-xl bg-brand-500 hover:bg-brand-600 text-white text-sm font-bold shadow-lg shadow-brand-500/20">সেটিং সেভ করুন</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- 5. PRINTABLE RECEIPT MODAL (With Signature Placement) -->
-    <div id="receiptModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm hidden overflow-y-auto p-4">
-        <div class="bg-brand-cardBg border border-brand-borderColor rounded-2xl w-full max-w-md shadow-2xl overflow-hidden">
             
-            <div class="bg-brand-cardBg px-6 py-4 border-b border-brand-borderColor flex items-center justify-between">
-                <h3 class="text-base font-bold text-white flex items-center gap-2">
-                    <i class="fa-solid fa-file-invoice-dollar text-brand-500"></i> বিল রসিদ (Receipt Preview)
-                </h3>
-                <button onclick="closeModal('receiptModal')" class="text-slate-400 hover:text-white">
-                    <i class="fa-solid fa-xmark text-xl"></i>
-                </button>
-            </div>
+            <form onsubmit="saveSettings(event)" class="p-5 space-y-4 max-h-[80vh] overflow-y-auto">
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">আপনার নাম (Admin Name) <span class="text-rose-500">*</span></label>
+                    <input type="text" id="setAdminName" required class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-emerald-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">ওয়াইফাই এর নাম <span class="text-rose-500">*</span></label>
+                    <input type="text" id="setWifiName" required class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-emerald-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">ঠিকানা / লোকেশন</label>
+                    <input type="text" id="setAddress" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3.5 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-emerald-500">
+                </div>
 
-            <!-- Printable Receipt Canvas Area -->
-            <div class="p-4 bg-slate-900">
-                <div id="receiptPDFArea" class="bg-white text-slate-900 p-6 rounded-xl shadow-inner space-y-4 text-xs font-sans">
+                <!-- Signature Image File Setup -->
+                <div class="border-t border-slate-800 pt-4">
+                    <label class="block text-xs font-medium text-slate-300 mb-1">ডিজিটাল সিগনেচার (ছবি আপলোড/অঙ্কন)</label>
+                    <input type="file" id="sigFileInput" accept="image/*" onchange="handleSignatureUpload(event)" class="w-full text-xs text-slate-400 file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-emerald-600/20 file:text-emerald-400 hover:file:bg-emerald-600/30 mb-2">
                     
-                    <!-- Header -->
-                    <div class="text-center border-b pb-3 border-slate-200">
-                        <h2 class="text-lg font-bold text-emerald-600 uppercase tracking-wide" id="pdfWifiTitle">স্পিডনেট ওয়াইফাই জোন্</h2>
-                        <p class="text-[11px] text-slate-500" id="pdfWifiAddress">রুম # ৪২০, হাউস # ১৫, ঢাকা</p>
-                        <p class="text-[11px] text-slate-500">হেল্পলাইন: <span id="pdfWifiPhone">01700000000</span></p>
-                    </div>
-
-                    <!-- Receipt Info -->
-                    <div class="flex justify-between items-center bg-slate-50 p-2 rounded border border-slate-200 text-[11px]">
-                        <div>
-                            <p><span class="font-bold">রসিদ নং:</span> #<span id="pdfReceiptNo">1001</span></p>
-                            <p><span class="font-bold">তারিখ:</span> <span id="pdfDate">08/11/2026</span></p>
-                        </div>
-                        <div class="text-right">
-                            <span class="inline-block px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded font-bold uppercase text-[10px]">পরিশোধিত</span>
+                    <div class="mt-2">
+                        <span class="text-[11px] text-slate-400 block mb-1">সংরক্ষিত সিগনেচার প্রিভিউ:</span>
+                        <div class="w-full h-24 bg-white rounded-xl flex items-center justify-center border border-slate-700 overflow-hidden p-2">
+                            <img id="signaturePreview" src="" alt="Signature Preview" class="max-h-full object-contain hidden">
+                            <span id="noSigText" class="text-xs text-slate-400">কোনো সিগনেচার আপলোড করা নেই</span>
                         </div>
                     </div>
-
-                    <!-- Customer Info -->
-                    <div class="space-y-1">
-                        <p><span class="font-bold text-slate-700">গ্রাহকের নাম:</span> <span id="pdfCustName" class="font-semibold">আব্দুর রহমান</span></p>
-                        <p><span class="font-bold text-slate-700">মোবাইল:</span> <span id="pdfCustPhone">01700000000</span></p>
-                        <p><span class="font-bold text-slate-700">প্যাকেজ:</span> <span id="pdfCustPackage">10 Mbps</span></p>
-                    </div>
-
-                    <!-- Payment Summary Table -->
-                    <table class="w-full text-left border-collapse border border-slate-200 mt-2">
-                        <thead>
-                            <tr class="bg-slate-100 text-slate-700">
-                                <th class="p-2 border border-slate-200">বিবরণ</th>
-                                <th class="p-2 border border-slate-200 text-right">পরিমাণ (৳)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td class="p-2 border border-slate-200">ওয়াইফাই মাসিক বিল (চলতি মাস)</td>
-                                <td class="p-2 border border-slate-200 text-right font-bold" id="pdfAmount">৳ 500</td>
-                            </tr>
-                        </tbody>
-                    </table>
-
-                    <!-- Digital Signature Display Slot (Inserted cleanly dynamically) -->
-                    <div class="pt-6 mt-4 flex items-end justify-between">
-                        <div class="text-[10px] text-slate-400">
-                            ধন্যবাদ সাথে থাকার জন্য!
-                        </div>
-                        <div class="text-center w-32">
-                            <div class="h-12 w-full border-b border-dashed border-slate-400 flex items-center justify-center pb-1">
-                                <img id="pdfSignatureImg" src="" alt="Signature" class="max-h-full max-w-full object-contain hidden">
-                                <span id="pdfNoSigText" class="text-[9px] text-slate-300 italic">কোন সিগনেচার নাই</span>
-                            </div>
-                            <span class="text-[10px] font-bold text-slate-700 block mt-1">কর্তৃপক্ষের স্বাক্ষর</span>
-                        </div>
-                    </div>
-
                 </div>
-            </div>
 
-            <!-- Footer Modal Action -->
-            <div class="p-4 bg-brand-cardBg border-t border-brand-borderColor flex items-center justify-end gap-3">
-                <button onclick="closeModal('receiptModal')" class="px-4 py-2 rounded-xl border border-slate-700 text-slate-300 hover:bg-slate-800 text-xs font-medium">বন্ধ করুন</button>
-                <button onclick="downloadPDFReceipt()" class="px-4 py-2 rounded-xl bg-brand-500 hover:bg-brand-600 text-white text-xs font-bold flex items-center gap-2 shadow-lg shadow-brand-500/20">
-                    <i class="fa-solid fa-download"></i> পিডিএফ ডাউনলোড
-                </button>
-            </div>
-
+                <div class="pt-2 flex gap-3">
+                    <button type="button" onclick="closeModal('settingsModal')" class="w-1/2 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium rounded-xl text-sm transition">বাতিল</button>
+                    <button type="submit" class="w-1/2 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-medium rounded-xl text-sm transition shadow-lg shadow-emerald-600/30">সেটিং সেভ করুন</button>
+                </div>
+            </form>
         </div>
     </div>
 
+    <!-- Hidden PDF Receipt Template for Generation -->
+    <div class="hidden">
+        <div id="pdfTemplate" class="p-8 bg-white text-slate-900 w-[500px]" style="font-family: Arial, sans-serif;">
+            <div class="text-center border-b pb-4 mb-4">
+                <h2 id="pdfWifiName" class="text-xl font-bold text-emerald-700">স্পিডনেট ওয়াইফাই জোন্</h2>
+                <p id="pdfAddress" class="text-xs text-slate-500">ওয়াইফাই বিল মানিরসিদ</p>
+            </div>
+            <div class="space-y-2 text-sm mb-6">
+                <div class="flex justify-between"><span>তারিখ:</span> <span id="pdfDate" class="font-medium"></span></div>
+                <div class="flex justify-between"><span>গ্রাহকের নাম:</span> <span id="pdfCustName" class="font-bold"></span></div>
+                <div class="flex justify-between"><span>WhatsApp:</span> <span id="pdfCustPhone"></span></div>
+                <div class="flex justify-between"><span>রুম/ঠিকানা:</span> <span id="pdfCustRoom"></span></div>
+                <div class="border-t pt-2 flex justify-between font-bold text-base">
+                    <span>আদায়কৃত বিল:</span>
+                    <span id="pdfAmount" class="text-emerald-700"></span>
+                </div>
+            </div>
+            <!-- Auto Inserted Signature Section -->
+            <div class="mt-12 flex justify-between items-end pt-4 border-t border-slate-200">
+                <div class="text-center">
+                    <p class="text-xs text-slate-400">গ্রাহকের স্বাক্ষর</p>
+                </div>
+                <div class="text-center flex flex-col items-center">
+                    <div id="pdfSigContainer" class="h-12 flex items-center justify-center mb-1">
+                        <!-- Signature Image injected here dynamically -->
+                    </div>
+                    <p id="pdfAdminName" class="text-xs font-bold text-slate-700 border-t border-slate-400 pt-1 px-4"></p>
+                    <p class="text-[10px] text-slate-400">কর্তৃপক্ষের স্বাক্ষর</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
-    <!-- JavaScript Application Logic -->
+    <!-- Application Script Logic -->
     <script>
-        // Store Application State
-        let appState = {
-            adminName: "মো: আরিফুল ইসলাম",
-            wifiName: "স্পিডনেট ওয়াইফাই জোন্",
-            address: "রুম # ৪২০, হাউস # ১৫, ঢাকা",
-            whatsapp: "8801700000000",
-            bkash: "01700000000",
-            signatureData: "", // Base64 signature
-            customers: [
-                { id: 101, name: "মো: আরিফুল ইসলাম", phone: "01700000000", package: "10 Mbps", bill: 1000, status: "পরিশোধিত" },
-                { id: 102, name: "আব্দুল করিম", phone: "01800000000", package: "10 Mbps", bill: 1000, status: "পরিশোধিত" }
-            ],
-            expenses: 0,
-            income: 2000,
-            activeReceiptCustomer: null
+        // State Management with LocalStorage
+        let state = {
+            settings: JSON.parse(localStorage.getItem('wifi_settings')) || {
+                adminName: 'মো: সাইফুল ইসলাম',
+                wifiName: 'স্পিডনেট ওয়াইফাই জোন্',
+                address: 'পূর্ব সাহেব নগর, পরশুরাম, ফেনী',
+                signature: ''
+            },
+            customers: JSON.parse(localStorage.getItem('wifi_customers')) || [],
+            expenses: JSON.parse(localStorage.getItem('wifi_expenses')) || [],
+            bills: JSON.parse(localStorage.getItem('wifi_bills')) || []
         };
 
-        // Signature Canvas variables
-        let sigCanvas, sigCtx;
-        let isDrawing = false;
+        // Initialize App
+        document.addEventListener('DOMContentLoaded', () => {
+            initDates();
+            renderSettings();
+            renderCustomers();
+            calculateMetrics();
+        });
 
-        // On Document Load
-        window.onload = function() {
-            // Load saved data from localStorage if exists
-            const savedState = localStorage.getItem('speednet_wifi_state');
-            if (savedState) {
-                try {
-                    const parsed = JSON.parse(savedState);
-                    appState = { ...appState, ...parsed };
-                } catch(e) { console.error("Error loading state", e); }
-            }
-
-            initSignatureCanvas();
-            renderDashboard();
-            updateHeaderInfo();
-        };
-
-        // Save State
         function saveState() {
-            localStorage.setItem('speednet_wifi_state', JSON.stringify(appState));
-            renderDashboard();
-            updateHeaderInfo();
+            localStorage.setItem('wifi_settings', JSON.stringify(state.settings));
+            localStorage.setItem('wifi_customers', JSON.stringify(state.customers));
+            localStorage.setItem('wifi_expenses', JSON.stringify(state.expenses));
+            localStorage.setItem('wifi_bills', JSON.stringify(state.bills));
+            calculateMetrics();
         }
 
-        // Header Update
-        function updateHeaderInfo() {
-            document.getElementById('headerAdminName').innerText = appState.adminName;
-            document.getElementById('headerWifiName').innerText = appState.wifiName;
+        function initDates() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('custConnDate').value = today;
+            document.getElementById('expDate').value = today;
+            document.getElementById('billDate').value = today;
         }
 
-        // Render Dashboard Tables & Stats
-        function renderDashboard() {
-            // Stats
-            document.getElementById('totalActiveCustomers').innerText = appState.customers.length;
-            document.getElementById('monthlyIncome').innerText = appState.income;
-            document.getElementById('monthlyExpense').innerText = appState.expenses;
+        // Modal Handlers
+        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
-            // Customer Table
-            const tbody = document.getElementById('customerTableBody');
-            tbody.innerHTML = "";
-
-            // Populate Bill Modal Select Dropdown
-            const billSelect = document.getElementById('billCustomerSelect');
-            billSelect.innerHTML = "";
-
-            appState.customers.forEach((cust) => {
-                // Add to table
-                const tr = document.createElement('tr');
-                tr.className = "border-b border-brand-borderColor/50 hover:bg-brand-cardHover/50 transition-colors";
-                tr.innerHTML = `
-                    <td class="p-3">
-                        <div class="font-bold text-white">${cust.name}</div>
-                        <div class="text-[11px] text-slate-400">ID: #${cust.id}</div>
-                    </td>
-                    <td class="p-3 text-slate-300">${cust.phone}</td>
-                    <td class="p-3">
-                        <span class="text-xs bg-slate-800 text-slate-300 px-2 py-0.5 rounded">${cust.package}</span>
-                        <div class="font-bold text-brand-500 mt-0.5">৳ ${cust.bill}</div>
-                    </td>
-                    <td class="p-3">
-                        <span class="inline-flex items-center gap-1 text-[11px] px-2.5 py-1 rounded-full font-semibold ${cust.status === 'পরিশোধিত' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'}">
-                            <i class="fa-solid ${cust.status === 'পরিশোধিত' ? 'fa-check' : 'fa-clock'} text-[10px]"></i> ${cust.status}
-                        </span>
-                    </td>
-                    <td class="p-3 text-right">
-                        <button onclick="openReceiptModal(${cust.id})" class="px-3 py-1.5 rounded-lg bg-brand-500/10 hover:bg-brand-500 text-brand-500 hover:text-white border border-brand-500/30 text-xs font-medium transition-all">
-                            <i class="fa-solid fa-print mr-1"></i> রসিদ
-                        </button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-
-                // Add option to bill select
-                const option = document.createElement('option');
-                option.value = cust.id;
-                option.textContent = `${cust.name} (${cust.phone}) - ৳${cust.bill}`;
-                billSelect.appendChild(option);
-            });
-
-            // Update signature previews in settings
-            updateSignaturePreviewDOM();
-        }
-
-        // Signature Canvas Logic
-        function initSignatureCanvas() {
-            sigCanvas = document.getElementById('sigCanvas');
-            if (!sigCanvas) return;
-            sigCtx = sigCanvas.getContext('2d');
-
-            // Resize canvas to match display size
-            sigCanvas.width = sigCanvas.offsetWidth || 300;
-            sigCanvas.height = sigCanvas.offsetHeight || 144;
-
-            sigCtx.lineWidth = 2.5;
-            sigCtx.lineCap = 'round';
-            sigCtx.strokeStyle = '#000000';
-
-            // Mouse events
-            sigCanvas.addEventListener('mousedown', startDrawing);
-            sigCanvas.addEventListener('mousemove', draw);
-            sigCanvas.addEventListener('mouseup', stopDrawing);
-            sigCanvas.addEventListener('mouseleave', stopDrawing);
-
-            // Touch events for mobile
-            sigCanvas.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                const touch = e.touches[0];
-                const rect = sigCanvas.getBoundingClientRect();
-                isDrawing = true;
-                sigCtx.beginPath();
-                sigCtx.moveTo(touch.clientX - rect.left, touch.clientY - rect.top);
-            });
-
-            sigCanvas.addEventListener('touchmove', (e) => {
-                e.preventDefault();
-                if (!isDrawing) return;
-                const touch = e.touches[0];
-                const rect = sigCanvas.getBoundingClientRect();
-                sigCtx.lineTo(touch.clientX - rect.left, touch.clientY - rect.top);
-                sigCtx.stroke();
-            });
-
-            sigCanvas.addEventListener('touchend', stopDrawing);
-        }
-
-        function startDrawing(e) {
-            isDrawing = true;
-            sigCtx.beginPath();
-            sigCtx.moveTo(e.offsetX, e.offsetY);
-        }
-
-        function draw(e) {
-            if (!isDrawing) return;
-            sigCtx.lineTo(e.offsetX, e.offsetY);
-            sigCtx.stroke();
-        }
-
-        function stopDrawing() {
-            if (isDrawing) {
-                isDrawing = false;
-                // Auto capture drawn canvas to appState
-                appState.signatureData = sigCanvas.toDataURL('image/png');
-                updateSignaturePreviewDOM();
-            }
-        }
-
-        function clearSignatureCanvas() {
-            if (sigCtx && sigCanvas) {
-                sigCtx.clearRect(0, 0, sigCanvas.width, sigCanvas.height);
-            }
-            appState.signatureData = "";
-            const fileInput = document.getElementById('sigFileInput');
-            if (fileInput) fileInput.value = "";
-            updateSignaturePreviewDOM();
-        }
-
-        function switchSigTab(tab) {
-            const drawBox = document.getElementById('sigDrawContainer');
-            const uploadBox = document.getElementById('sigUploadContainer');
-            const drawBtn = document.getElementById('tabDrawBtn');
-            const uploadBtn = document.getElementById('tabUploadBtn');
-
-            if (tab === 'draw') {
-                drawBox.classList.remove('hidden');
-                uploadBox.classList.add('hidden');
-                drawBtn.className = "flex-1 py-1.5 text-xs font-semibold rounded-lg bg-brand-500 text-white border border-brand-500 transition-all";
-                uploadBtn.className = "flex-1 py-1.5 text-xs font-semibold rounded-lg bg-brand-inputBg text-slate-400 border border-brand-borderColor transition-all";
+        // Customer CRUD
+        function openCustomerModal(id = null) {
+            const form = document.getElementById('customerForm');
+            form.reset();
+            initDates();
+            
+            if (id !== null) {
+                const cust = state.customers.find(c => c.id === id);
+                if (cust) {
+                    document.getElementById('customerId').value = cust.id;
+                    document.getElementById('custName').value = cust.name;
+                    document.getElementById('custWhatsapp').value = cust.whatsapp;
+                    document.getElementById('custRoom').value = cust.room || '';
+                    document.getElementById('custConnDate').value = cust.connDate || '';
+                    document.getElementById('custBill').value = cust.bill;
+                    document.getElementById('custNote').value = cust.note || '';
+                    document.getElementById('customerModalTitle').innerHTML = '<i class="fa-solid fa-user-pen"></i> গ্রাহক তথ্য এডিট';
+                }
             } else {
-                drawBox.classList.add('hidden');
-                uploadBox.classList.remove('hidden');
-                uploadBtn.className = "flex-1 py-1.5 text-xs font-semibold rounded-lg bg-brand-500 text-white border border-brand-500 transition-all";
-                drawBtn.className = "flex-1 py-1.5 text-xs font-semibold rounded-lg bg-brand-inputBg text-slate-400 border border-brand-borderColor transition-all";
+                document.getElementById('customerId').value = '';
+                document.getElementById('customerModalTitle').innerHTML = '<i class="fa-solid fa-user-plus"></i> নতুন গ্রাহক এন্ট্রি';
+            }
+            openModal('customerModal');
+        }
+
+        function saveCustomer(e) {
+            e.preventDefault();
+            const id = document.getElementById('customerId').value;
+            const custData = {
+                id: id ? parseInt(id) : Date.now(),
+                name: document.getElementById('custName').value,
+                whatsapp: document.getElementById('custWhatsapp').value,
+                room: document.getElementById('custRoom').value,
+                connDate: document.getElementById('custConnDate').value,
+                bill: parseFloat(document.getElementById('custBill').value) || 0,
+                note: document.getElementById('custNote').value
+            };
+
+            if (id) {
+                const idx = state.customers.findIndex(c => c.id === parseInt(id));
+                if (idx !== -1) state.customers[idx] = custData;
+            } else {
+                state.customers.push(custData);
+            }
+
+            saveState();
+            renderCustomers();
+            closeModal('customerModal');
+        }
+
+        function deleteCustomer(id) {
+            if (confirm('আপনি কি নিশ্চিত যে এই গ্রাহককে মুছে ফেলতে চান?')) {
+                state.customers = state.customers.filter(c => c.id !== id);
+                saveState();
+                renderCustomers();
             }
         }
 
-        function handleSignatureFileUpload(event) {
-            const file = event.target.files[0];
+        function renderCustomers() {
+            const container = document.getElementById('customerList');
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            container.innerHTML = '';
+
+            const filtered = state.customers.filter(c => 
+                c.name.toLowerCase().includes(search) || 
+                c.whatsapp.includes(search) ||
+                (c.room && c.room.toLowerCase().includes(search))
+            );
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="text-center py-6 text-xs text-slate-500">কোনো গ্রাহক পাওয়া যায়নি</div>`;
+                return;
+            }
+
+            filtered.forEach(cust => {
+                const div = document.createElement('div');
+                div.className = 'glass-card rounded-xl p-3 flex justify-between items-center border-l-4 border-l-emerald-500';
+                div.innerHTML = `
+                    <div class="space-y-0.5">
+                        <div class="font-bold text-sm text-slate-100 flex items-center gap-2">
+                            ${cust.name}
+                            ${cust.room ? `<span class="text-[10px] bg-slate-800 text-slate-400 px-2 py-0.5 rounded-md border border-slate-700">${cust.room}</span>` : ''}
+                        </div>
+                        <div class="text-xs text-slate-400 flex items-center gap-3">
+                            <span><i class="fa-brands fa-whatsapp text-emerald-400"></i> ${cust.whatsapp}</span>
+                            <span><i class="fa-solid fa-money-bill text-amber-400"></i> ৳${cust.bill}</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <button onclick="downloadReceipt(${cust.id})" title="পিডিএফ ডাউনলোড" class="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 flex items-center justify-center text-xs transition">
+                            <i class="fa-solid fa-file-pdf"></i>
+                        </button>
+                        <button onclick="openCustomerModal(${cust.id})" title="এডিট করুন" class="w-8 h-8 rounded-lg bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 flex items-center justify-center text-xs transition">
+                            <i class="fa-solid fa-pen"></i>
+                        </button>
+                        <button onclick="deleteCustomer(${cust.id})" title="ডিলিট করুন" class="w-8 h-8 rounded-lg bg-rose-500/10 text-rose-400 hover:bg-rose-500/20 flex items-center justify-center text-xs transition">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // Expense Handlers
+        function openExpenseModal() {
+            openModal('expenseModal');
+        }
+        function saveExpense(e) {
+            e.preventDefault();
+            const exp = {
+                id: Date.now(),
+                title: document.getElementById('expTitle').value,
+                amount: parseFloat(document.getElementById('expAmount').value) || 0,
+                date: document.getElementById('expDate').value
+            };
+            state.expenses.push(exp);
+            saveState();
+            closeModal('expenseModal');
+        }
+
+        // Bill Handlers
+        function openBillModal() {
+            const select = document.getElementById('billCustomerId');
+            select.innerHTML = '<option value="">গ্রাহক বেছে নিন</option>';
+            state.customers.forEach(c => {
+                select.innerHTML += `<option value="${c.id}">${c.name} (${c.whatsapp}) - ৳${c.bill}</option>`;
+            });
+            openModal('billModal');
+        }
+        function onBillCustomerChange() {
+            const id = parseInt(document.getElementById('billCustomerId').value);
+            const cust = state.customers.find(c => c.id === id);
+            if (cust) {
+                document.getElementById('billAmount').value = cust.bill;
+            }
+        }
+        function saveBill(e) {
+            e.preventDefault();
+            const custId = parseInt(document.getElementById('billCustomerId').value);
+            const amount = parseFloat(document.getElementById('billAmount').value) || 0;
+            const bill = {
+                id: Date.now(),
+                customerId: custId,
+                amount: amount,
+                date: document.getElementById('billDate').value
+            };
+            state.bills.push(bill);
+            saveState();
+            closeModal('billModal');
+        }
+
+        // Metrics Calculation
+        function calculateMetrics() {
+            document.getElementById('totalCustomers').innerText = state.customers.length;
+            
+            const income = state.bills.reduce((sum, b) => sum + b.amount, 0);
+            document.getElementById('monthlyIncome').innerText = `৳ ${income}`;
+
+            const expense = state.expenses.reduce((sum, e) => sum + e.amount, 0);
+            document.getElementById('monthlyExpense').innerText = `৳ ${expense}`;
+
+            const totalExpected = state.customers.reduce((sum, c) => sum + c.bill, 0);
+            const due = Math.max(0, totalExpected - income);
+            document.getElementById('totalDue').innerText = `৳ ${due}`;
+        }
+
+        // Settings & Signature Image Processing
+        function renderSettings() {
+            document.getElementById('navAdminName').innerText = state.settings.adminName;
+            document.getElementById('navAppTitle').innerText = state.settings.wifiName;
+            document.getElementById('setAdminName').value = state.settings.adminName;
+            document.getElementById('setWifiName').value = state.settings.wifiName;
+            document.getElementById('setAddress').value = state.settings.address || '';
+
+            const preview = document.getElementById('signaturePreview');
+            const noSigText = document.getElementById('noSigText');
+            if (state.settings.signature) {
+                preview.src = state.settings.signature;
+                preview.classList.remove('hidden');
+                noSigText.classList.add('hidden');
+            } else {
+                preview.classList.add('hidden');
+                noSigText.classList.remove('hidden');
+            }
+        }
+
+        function handleSignatureUpload(e) {
+            const file = e.target.files[0];
             if (file) {
                 const reader = new FileReader();
-                reader.onload = function(e) {
-                    appState.signatureData = e.target.result;
-                    updateSignaturePreviewDOM();
+                reader.onload = function(evt) {
+                    state.settings.signature = evt.target.result;
+                    renderSettings();
                 };
                 reader.readAsDataURL(file);
             }
         }
 
-        function updateSignaturePreviewDOM() {
-            const imgEl = document.getElementById('currentSigPreview');
-            const noText = document.getElementById('noSigText');
-            
-            if (appState.signatureData) {
-                imgEl.src = appState.signatureData;
-                imgEl.classList.remove('hidden');
-                noText.classList.add('hidden');
-            } else {
-                imgEl.src = "";
-                imgEl.classList.add('hidden');
-                noText.classList.remove('hidden');
-            }
-        }
-
-        // Modal Controls
-        function openModal(id) {
-            if (id === 'settingsModal') {
-                document.getElementById('settingAdminName').value = appState.adminName;
-                document.getElementById('settingWifiName').value = appState.wifiName;
-                document.getElementById('settingAddress').value = appState.address;
-                document.getElementById('settingWhatsapp').value = appState.whatsapp;
-                document.getElementById('settingBkash').value = appState.bkash;
-                
-                setTimeout(() => {
-                    initSignatureCanvas();
-                }, 100);
-            }
-            document.getElementById(id).classList.remove('hidden');
-        }
-
-        function closeModal(id) {
-            document.getElementById(id).classList.add('hidden');
-        }
-
-        // Handle Add Customer
-        function handleCustomerSubmit(e) {
+        function saveSettings(e) {
             e.preventDefault();
-            const name = document.getElementById('custName').value.trim();
-            const phone = document.getElementById('custPhone').value.trim();
-            const pkg = document.getElementById('custPackage').value;
-            const bill = parseFloat(document.getElementById('custBill').value) || 0;
-
-            const newCust = {
-                id: Math.floor(1000 + Math.random() * 9000),
-                name: name,
-                phone: phone,
-                package: pkg,
-                bill: bill,
-                status: "পরিশোধিত"
-            };
-
-            appState.customers.push(newCust);
-            appState.income += bill;
+            state.settings.adminName = document.getElementById('setAdminName').value;
+            state.settings.wifiName = document.getElementById('setWifiName').value;
+            state.settings.address = document.getElementById('setAddress').value;
             saveState();
-
-            // Clear & Close
-            document.getElementById('addCustomerForm').reset();
-            closeModal('customerModal');
-        }
-
-        // Handle Expense Submit
-        function handleExpenseSubmit(e) {
-            e.preventDefault();
-            const amount = parseFloat(document.getElementById('expAmount').value) || 0;
-            appState.expenses += amount;
-            saveState();
-
-            e.target.reset();
-            closeModal('expenseModal');
-        }
-
-        // Handle Bill Submit
-        function handleBillSubmit(e) {
-            e.preventDefault();
-            const amount = parseFloat(document.getElementById('billAmount').value) || 0;
-            appState.income += amount;
-            saveState();
-
-            e.target.reset();
-            closeModal('billModal');
-        }
-
-        // Handle Settings Save
-        function handleSettingsSave(e) {
-            e.preventDefault();
-            appState.adminName = document.getElementById('settingAdminName').value;
-            appState.wifiName = document.getElementById('settingWifiName').value;
-            appState.address = document.getElementById('settingAddress').value;
-            appState.whatsapp = document.getElementById('settingWhatsapp').value;
-            appState.bkash = document.getElementById('settingBkash').value;
-
-            saveState();
+            renderSettings();
             closeModal('settingsModal');
         }
 
-        // Open Receipt Modal & Render Signature in PDF preview
-        function openReceiptModal(custId) {
-            const cust = appState.customers.find(c => c.id === custId);
+        // PDF Generation with Auto Signature Insertion
+        function downloadReceipt(customerId) {
+            const cust = state.customers.find(c => c.id === customerId);
             if (!cust) return;
 
-            appState.activeReceiptCustomer = cust;
-
-            document.getElementById('pdfWifiTitle').innerText = appState.wifiName;
-            document.getElementById('pdfWifiAddress').innerText = appState.address;
-            document.getElementById('pdfWifiPhone').innerText = appState.whatsapp;
-
-            document.getElementById('pdfReceiptNo').innerText = cust.id;
+            document.getElementById('pdfWifiName').innerText = state.settings.wifiName;
+            document.getElementById('pdfAddress').innerText = state.settings.address || '';
+            document.getElementById('pdfDate').innerText = new Date().toLocaleDateString('bn-BD');
             document.getElementById('pdfCustName').innerText = cust.name;
-            document.getElementById('pdfCustPhone').innerText = cust.phone;
-            document.getElementById('pdfCustPackage').innerText = cust.package;
+            document.getElementById('pdfCustPhone').innerText = cust.whatsapp;
+            document.getElementById('pdfCustRoom').innerText = cust.room || 'N/A';
             document.getElementById('pdfAmount').innerText = `৳ ${cust.bill}`;
+            document.getElementById('pdfAdminName').innerText = state.settings.adminName;
 
-            const d = new Date();
-            document.getElementById('pdfDate').innerText = `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
-
-            // Attach Saved Signature Image into the PDF Receipt bottom slot
-            const pdfSigImg = document.getElementById('pdfSignatureImg');
-            const pdfNoSigText = document.getElementById('pdfNoSigText');
-
-            if (appState.signatureData) {
-                pdfSigImg.src = appState.signatureData;
-                pdfSigImg.classList.remove('hidden');
-                pdfNoSigText.classList.add('hidden');
+            const sigContainer = document.getElementById('pdfSigContainer');
+            if (state.settings.signature) {
+                sigContainer.innerHTML = `<img src="${state.settings.signature}" class="max-h-12 object-contain" />`;
             } else {
-                pdfSigImg.src = "";
-                pdfSigImg.classList.add('hidden');
-                pdfNoSigText.classList.remove('hidden');
+                sigContainer.innerHTML = `<span class="text-xs text-slate-300 italic">[কোনো সিগনেচার যুক্ত নেই]</span>`;
             }
 
-            openModal('receiptModal');
-        }
-
-        // Download PDF Receipt
-        function downloadPDFReceipt() {
-            const element = document.getElementById('receiptPDFArea');
+            const element = document.getElementById('pdfTemplate');
             const opt = {
-                margin:       0.2,
-                filename:     `Receipt_${appState.activeReceiptCustomer ? appState.activeReceiptCustomer.name : 'wifi_bill'}.pdf`,
+                margin:       10,
+                filename:     `Receipt_${cust.name}.pdf`,
                 image:        { type: 'jpeg', quality: 0.98 },
                 html2canvas:  { scale: 2 },
-                jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+                jsPDF:        { unit: 'mm', format: 'a5', orientation: 'portrait' }
             };
 
             html2pdf().set(opt).from(element).save();
